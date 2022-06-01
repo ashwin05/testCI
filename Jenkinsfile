@@ -34,7 +34,11 @@ node {
         // -------------------------------------------------------------------------
 
         stage('Authorize Org') {
-            rc = command "${toolbelt}/sfdx auth:jwt:grant --instanceurl ${SF_INSTANCE_URL} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile ${server_key_file} --setalias testOrg"
+            if(isUnix()){
+                rc = sh returnStatus: true, script: "${toolbelt} force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile ${server_key_file} --setalias testOrg"
+            } else{
+                rc = bat returnStatus: true, script: "\"${toolbelt}\" force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setalias testOrg"
+            }
             if (rc != 0) {
                 error 'Salesforce authorization failed.'
             }
